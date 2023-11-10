@@ -1,7 +1,7 @@
 #!/bin/bash
 # shell vars set here will be overridden by same shell vars set in $BASE_PATH/.shell-vars file
 BASE_PATH="/srv/pbs"
-IMAGE="pbs"
+IMAGE="neomediatech/pbs:latest"
 NAME="pbs"
 VOLUMES="" # volumes set here will be added to volumes found in $BASE_PATH/.volumes file (if it exists)
 PORTS="-p 8007:8007"
