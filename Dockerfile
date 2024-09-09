@@ -1,6 +1,6 @@
 FROM debian:bookworm
 
-ENV PBS_VERSION=3.0-3 \
+ENV PBS_VERSION=3.2-1 \
     DEBIAN_FRONTEND=noninteractive \
     SERVICE=pbs-docker
 
