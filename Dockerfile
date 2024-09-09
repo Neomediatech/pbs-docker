@@ -19,7 +19,7 @@ RUN apt-get update && \
     apt-get -y --no-install-recommends --no-install-suggests dist-upgrade
 
 # install some needed package
-RUN apt-get -y --no-install-recommends --no-install-suggests install ca-certificates openssl wget gosu
+RUN apt-get -y --no-install-recommends --no-install-suggests install ca-certificates openssl wget gosu rsyslog tini
 
 # add PBS repository
 RUN wget https://enterprise.proxmox.com/debian/proxmox-release-bookworm.gpg -O /etc/apt/trusted.gpg.d/proxmox-release-bookworm.gpg
@@ -28,6 +28,10 @@ RUN echo "deb http://download.proxmox.com/debian/pbs bookworm pbs-no-subscriptio
 # install PBS
 RUN apt-get update && \
     apt-get install -y -V --no-install-recommends proxmox-backup-server 
+
+# disable kernel logging module and log everything to stdout
+RUN sed -i '/.*imklog.*/d' /etc/rsyslog.conf && \
+    echo '*.* /dev/stdout' >> /etc/rsyslog.conf
 
 COPY entrypoint.sh /
 
@@ -43,7 +47,8 @@ RUN mkdir -p /etc/proxmox-backup /var/log/proxmox-backup /var/lib/proxmox-backup
     chmod -R 700 /etc/proxmox-backup && \
     chmod +x /entrypoint.sh
 
-ENTRYPOINT [ "/entrypoint.sh" ]
+# add tini support to avoid zombies (as Postfix does)
+ENTRYPOINT [ "tini", "--", "/entrypoint.sh" ]
 
 CMD ["/bin/bash"]
 

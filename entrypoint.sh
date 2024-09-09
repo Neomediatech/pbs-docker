@@ -81,6 +81,9 @@ if [ -z "$USERS_ALREADY_EXISTS" ]; then
     docker_setup_pbs
 fi
 
+echo "Starting Rsyslogd..."
+rsyslogd
+
 echo "Starting Postfix..."
 /etc/init.d/postfix start || ok=1
 
