@@ -81,6 +81,9 @@ if [ -z "$USERS_ALREADY_EXISTS" ]; then
     docker_setup_pbs
 fi
 
+echo "Starting Postfix..."
+/etc/init.d/postfix start || ok=1
+
 echo "Running PBS..."
 exec gosu backup /usr/lib/x86_64-linux-gnu/proxmox-backup/proxmox-backup-proxy "$@"
 
