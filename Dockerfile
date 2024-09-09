@@ -31,7 +31,7 @@ RUN apt-get update && \
 
 # disable kernel logging module and log everything to stdout
 RUN sed -i '/.*imklog.*/d' /etc/rsyslog.conf && \
-    echo '*.* /dev/stdout' >> /etc/rsyslog.conf
+    echo '*.* -/proc/1/fd/1' >> /etc/rsyslog.conf
 
 COPY entrypoint.sh /
 
