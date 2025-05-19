@@ -1,0 +1,72 @@
+name: Build and Scan Docker Image
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build-and-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_TOKEN }}
+
+      - name: Set up image tag (lowercase)
+        id: vars
+        run: |
+          REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          echo "tag=ghcr.io/${REPO_LOWER}:${{ github.sha }}" >> $GITHUB_OUTPUT
+
+      - name: Build Docker image
+        run: docker build -t ${{ steps.vars.outputs.tag }} .
+
+      - name: Push Docker image to GHCR
+        run: docker push ${{ steps.vars.outputs.tag }}
+
+      - name: Install Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          version: latest
+
+      - name: Scan image with Trivy and generate HTML report
+        run: |
+          trivy image --format template --template "@/contrib/html.tpl" -o trivy-report.html ${{ steps.vars.outputs.tag }}
+
+      - name: Fail if Trivy found critical/high vulnerabilities
+        run: |
+          trivy image --exit-code 1 --severity CRITICAL,HIGH ${{ steps.vars.outputs.tag }}
+
+      - name: Send email with Trivy report attached
+        if: always()
+        run: |
+          echo "import smtplib" > send_email.py
+          echo "import ssl" >> send_email.py
+          echo "from email.message import EmailMessage" >> send_email.py
+          echo "from pathlib import Path" >> send_email.py
+          echo "" >> send_email.py
+          echo "msg = EmailMessage()" >> send_email.py
+          echo "msg['Subject'] = '📦 GitHub Actions - Build terminata: ${{ job.status }}'" >> send_email.py
+          echo "msg['From'] = '${{ secrets.SMTP_FROM }}'" >> send_email.py
+          echo "msg['To'] = '${{ secrets.SMTP_TO }}'" >> send_email.py
+          echo "msg.set_content('''Il workflow del repository \"${{ github.repository }}\" è terminato con stato: ${{ job.status }}\n\n🔗 Azione: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\n\nCommit: ${{ github.sha }}\nAutore: ${{ github.actor }}\nJob: ${{ github.workflow }}''')" >> send_email.py
+          echo "" >> send_email.py
+          echo "report_path = Path('trivy-report.html')" >> send_email.py
+          echo "if report_path.exists():" >> send_email.py
+          echo "    with report_path.open('rb') as f:" >> send_email.py
+          echo "        msg.add_attachment(f.read(), maintype='text', subtype='html', filename='trivy-report.html')" >> send_email.py
+          echo "" >> send_email.py
+          echo "context = ssl.create_default_context()" >> send_email.py
+          echo "with smtplib.SMTP_SSL('${{ secrets.SMTP_HOST }}', int('${{ secrets.SMTP_PORT }}'), context=context) as smtp:" >> send_email.py
+          # echo "    smtp.login('${{ secrets.SMTP_USER }}', '${{ secrets.SMTP_PASSWORD }}')" >> send_email.py
+          echo "    smtp.send_message(msg)" >> send_email.py
+
+          python3 send_email.py
