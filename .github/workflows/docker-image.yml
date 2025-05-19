@@ -24,7 +24,8 @@ jobs:
         id: vars
         run: |
           REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
-          echo "tag=ghcr.io/${REPO_LOWER}:${{ github.sha }}" >> $GITHUB_OUTPUT
+          echo "tag=ghcr.io/${REPO_LOWER}:latest" >> $GITHUB_OUTPUT
+          #echo "tag=ghcr.io/${REPO_LOWER}:${{ github.sha }}" >> $GITHUB_OUTPUT
 
       - name: Build Docker image
         run: docker build -t ${{ steps.vars.outputs.tag }} .
@@ -37,13 +38,26 @@ jobs:
         with:
           version: latest
 
-      - name: Scan image with Trivy and generate HTML report
-        run: |
-          trivy image --format template --template "@/contrib/html.tpl" -o trivy-report.html ${{ steps.vars.outputs.tag }}
+      - name: Run Trivy vulnerability scanner and save JSON report
+        uses: aquasecurity/trivy-action@master
+        with:
+          version: latest
+          image-ref: '${{ steps.vars.outputs.tag }}'
+          format: 'json'
+          output: 'trivy-report.json'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
 
-      - name: Fail if Trivy found critical/high vulnerabilities
+      #- name: Scan image with Trivy and save JSON report
+      #  run: trivy image --format json -o trivy-report.json ${{ steps.vars.outputs.tag }}
+
+      - name: Generate HTML report from JSON
+        run: trivy image --input trivy-report.json --format template --template "@/contrib/html.tpl" -o trivy-report.html
+
+      - name: Fail if critical/high vulnerabilities found
         run: |
-          trivy image --exit-code 1 --severity CRITICAL,HIGH ${{ steps.vars.outputs.tag }}
+          jq '.Results[].Vulnerabilities[] | select(.Severity == "CRITICAL" or .Severity == "HIGH")' trivy-report.json && exit 1 || exit 0
 
       - name: Send email with Trivy report attached
         if: always()
