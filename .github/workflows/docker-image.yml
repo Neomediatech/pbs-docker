@@ -46,7 +46,8 @@ jobs:
       - name: Send email with Trivy report attached
         if: always()
         run: |
-          echo 'import smtplib
+          cat <<EOF > send_report.py
+import smtplib
 import ssl
 from email.message import EmailMessage
 from pathlib import Path
@@ -83,6 +84,6 @@ context = ssl.create_default_context()
 with smtplib.SMTP_SSL("${{ secrets.SMTP_HOST }}", int("${{ secrets.SMTP_PORT }}"), context=context) as smtp:
     smtp.login("${{ secrets.SMTP_USER }}", "${{ secrets.SMTP_PASSWORD }}")
     smtp.send_message(msg)
-' > send_report.py
+EOF
 
           python3 send_report.py
