@@ -1,0 +1,46 @@
+name: Test Email
+
+on:
+  workflow_dispatch:
+
+jobs:
+  send-email:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Create fake HTML report
+        run: echo "<html><body><h1>Report di test</h1></body></html>" > report.html
+
+      - name: Write Python script to send email
+        run: |
+          cat <<EOF > send_email.py
+import smtplib
+import ssl
+from email.message import EmailMessage
+from pathlib import Path
+
+msg = EmailMessage()
+msg["Subject"] = "📧 Test Email da GitHub Actions"
+msg["From"] = "${{ secrets.SMTP_FROM }}"
+msg["To"] = "${{ secrets.SMTP_TO }}"
+
+msg.set_content("Questo è un test di invio email da GitHub Actions.")
+
+report_path = Path("report.html")
+if report_path.exists():
+    with report_path.open("rb") as f:
+        msg.add_attachment(
+            f.read(),
+            maintype="text",
+            subtype="html",
+            filename="report.html"
+        )
+
+context = ssl.create_default_context()
+with smtplib.SMTP_SSL("${{ secrets.SMTP_HOST }}", int("${{ secrets.SMTP_PORT }}"), context=context) as smtp:
+    smtp.login("${{ secrets.SMTP_USER }}", "${{ secrets.SMTP_PASSWORD }}")
+    smtp.send_message(msg)
+EOF
+
+      - name: Run Python script
+        run: python3 send_email.py
