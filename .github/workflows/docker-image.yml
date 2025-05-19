@@ -57,7 +57,7 @@ msg["From"] = "${{ secrets.SMTP_FROM }}"
 msg["To"] = "${{ secrets.SMTP_TO }}"
 
 msg.set_content("""\
-Il workflow del repository \'${{ github.repository }}\' è terminato con stato: ${{ job.status }}
+Il workflow del repository '${{ github.repository }}' è terminato con stato: ${{ job.status }}
 
 🔗 Azione: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
