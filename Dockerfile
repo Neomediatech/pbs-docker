@@ -1,13 +1,14 @@
 FROM debian:bookworm
 
-ENV PBS_VERSION=3.4.1-1 \
+ENV APP_VERSION=3.4.1-1 \
     DEBIAN_FRONTEND=noninteractive \
-    SERVICE=pbs-docker
+    REPO=pbs-docker \
+    IMAGE=pbs
 
 LABEL maintainer="docker-dario@neomediatech.it" \ 
-      org.label-schema.version=$PBS_VERSION \
+      org.label-schema.version=$APP_VERSION \
       org.label-schema.vcs-type=Git \
-      org.label-schema.vcs-url=https://github.com/Neomediatech/${SERVICE} \
+      org.label-schema.vcs-url=https://github.com/Neomediatech/${REPO} \
       org.label-schema.maintainer=Neomediatech
 
 # workaround to make PBS install
