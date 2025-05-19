@@ -31,7 +31,7 @@ jobs:
           echo "" >> send_email.py
           echo "context = ssl.create_default_context()" >> send_email.py
           echo "with smtplib.SMTP_SSL('${{ secrets.SMTP_HOST }}', int('${{ secrets.SMTP_PORT }}'), context=context) as smtp:" >> send_email.py
-          echo "    smtp.login('${{ secrets.SMTP_USER }}', '${{ secrets.SMTP_PASSWORD }}')" >> send_email.py
+          #echo "    smtp.login('${{ secrets.SMTP_USER }}', '${{ secrets.SMTP_PASSWORD }}')" >> send_email.py
           echo "    smtp.send_message(msg)" >> send_email.py
 
       - name: Run Python script
