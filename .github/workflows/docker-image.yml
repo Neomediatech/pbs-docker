@@ -20,9 +20,11 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GHCR_TOKEN }}
 
-      - name: Set up image tag
+      - name: Set up image tag (lowercase)
         id: vars
-        run: echo "tag=ghcr.io/${{ github.repository }}:${{ github.sha }}" >> $GITHUB_OUTPUT
+        run: |
+          REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          echo "tag=ghcr.io/${REPO_LOWER}:${{ github.sha }}" >> $GITHUB_OUTPUT
 
       - name: Build Docker image
         run: docker build -t ${{ steps.vars.outputs.tag }} .
