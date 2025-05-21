@@ -34,7 +34,7 @@ jobs:
       #  run: docker push ${{ steps.vars.outputs.tag }}
 
       - name: Echo the generated image tag
-        run: echo "Attempting to scan image tag: ${{ steps.vars.outputs.tag }}"
+        run: echo "Attempting to scan image tag ${{ steps.vars.outputs.tag }}"
 
       - name: Install Trivy
         uses: aquasecurity/trivy-action@master
