@@ -33,20 +33,22 @@ jobs:
       #- name: Push Docker image to GHCR
       #  run: docker push ${{ steps.vars.outputs.tag }}
 
-      - name: Set INPUT_IMAGE_REF
-        run: echo "INPUT_IMAGE_REF=${{ steps.vars.outputs.tag }}" >> $GITHUB_ENV
+      #- name: Set INPUT_IMAGE_REF
+      #  run: echo "INPUT_IMAGE_REF=${{ steps.vars.outputs.tag }}" >> $GITHUB_ENV
 
       - name: Run Trivy vulnerability scanner and save JSON report
         uses: aquasecurity/trivy-action@0.30.0
         #run: trivy image --format json -o trivy-report.json --ignore-unfixed --vuln-type os,library --severity CRITICAL,HIGH $INPUT_IMAGE_REF
         with:
-          version: latest
+          #version: latest
           #image-ref: $INPUT_IMAGE_REF
           format: 'json'
           output: 'trivy-report.json'
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
+        env:
+          INPUT_IMAGE_REF: ${{ steps.vars.outputs.tag }}
 
       #- name: Scan image with Trivy and save JSON report
       #  run: trivy image --format json -o trivy-report.json ${{ steps.vars.outputs.tag }}
