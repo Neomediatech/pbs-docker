@@ -7,7 +7,7 @@ on:
 
 env:
   REPO_LOWER: $(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
-  INPUT_IMAGE_REF: ghcr.io/${REPO_LOWER}:latest
+  INPUT_IMAGE_REF: ghcr.io/$REPO_LOWER:latest
 
 jobs:
   build-and-scan:
@@ -38,7 +38,7 @@ jobs:
       #  run: docker push ${{ steps.vars.outputs.tag }}
 
       - name: Echo the generated image tag
-        run: echo "Attempting to scan image ${INPUT_IMAGE_REF}"
+        run: echo "Attempting to scan image $INPUT_IMAGE_REF"
 
       - name: Install Trivy
         uses: aquasecurity/trivy-action@0.30.0
