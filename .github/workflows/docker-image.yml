@@ -42,15 +42,16 @@ jobs:
           version: latest
 
       - name: Run Trivy vulnerability scanner and save JSON report
-        uses: aquasecurity/trivy-action@master
-        with:
-          version: latest
-          image-ref: ${{ steps.vars.outputs.tag }}
-          format: 'json'
-          output: 'trivy-report.json'
-          ignore-unfixed: true
-          vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
+        #uses: aquasecurity/trivy-action@master
+        run: trivy image --format json -o trivy-report.json --ignore-unfixed --vuln-type os,library --severity CRITICAL,HIGH ${{ steps.vars.outputs.tag }}
+        #with:
+        #  version: latest
+        #  image-ref: ${{ steps.vars.outputs.tag }}
+        #  format: 'json'
+        #  output: 'trivy-report.json'
+        #  ignore-unfixed: true
+        #  vuln-type: 'os,library'
+        #  severity: 'CRITICAL,HIGH'
 
       #- name: Scan image with Trivy and save JSON report
       #  run: trivy image --format json -o trivy-report.json ${{ steps.vars.outputs.tag }}
