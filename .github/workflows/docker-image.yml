@@ -33,7 +33,7 @@ jobs:
       #- name: Push Docker image to GHCR
       #  run: docker push ${{ steps.vars.outputs.tag }}
 
-      - name: Debug: Echo the generated image tag
+      - name: Echo the generated image tag
         run: echo "Attempting to scan image tag: ${{ steps.vars.outputs.tag }}"
 
       - name: Install Trivy
@@ -45,7 +45,7 @@ jobs:
         uses: aquasecurity/trivy-action@master
         with:
           version: latest
-          image_ref: "${{ steps.vars.outputs.tag }}"
+          image-ref: "${{ steps.vars.outputs.tag }}"
           format: 'json'
           output: 'trivy-report.json'
           ignore-unfixed: true
