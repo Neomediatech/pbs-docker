@@ -27,11 +27,14 @@ jobs:
           echo "tag=ghcr.io/${REPO_LOWER}:latest" >> $GITHUB_OUTPUT
           #echo "tag=ghcr.io/${REPO_LOWER}:${{ github.sha }}" >> $GITHUB_OUTPUT
 
-      - name: Build Docker image
-        run: docker build -t ${{ steps.vars.outputs.tag }} .
+      #- name: Build Docker image
+      #  run: docker build -t ${{ steps.vars.outputs.tag }} .
 
-      - name: Push Docker image to GHCR
-        run: docker push ${{ steps.vars.outputs.tag }}
+      #- name: Push Docker image to GHCR
+      #  run: docker push ${{ steps.vars.outputs.tag }}
+
+      - name: Debug: Echo the generated image tag
+        run: echo "Attempting to scan image tag: ${{ steps.vars.outputs.tag }}"
 
       - name: Install Trivy
         uses: aquasecurity/trivy-action@master
