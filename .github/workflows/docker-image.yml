@@ -41,7 +41,7 @@ jobs:
         #run: trivy image --format json -o trivy-report.json --ignore-unfixed --vuln-type os,library --severity CRITICAL,HIGH $INPUT_IMAGE_REF
         with:
           #version: latest
-          #image-ref: $INPUT_IMAGE_REF
+          image-ref: ${{ steps.vars.outputs.tag }}
           format: 'json'
           output: 'trivy-report.json'
           ignore-unfixed: true
