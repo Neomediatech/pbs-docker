@@ -37,12 +37,12 @@ jobs:
         run: echo "Attempting to scan image tag ${{ steps.vars.outputs.tag }}"
 
       - name: Install Trivy
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@0.30.0
         with:
           version: latest
 
       - name: Run Trivy vulnerability scanner and save JSON report
-        #uses: aquasecurity/trivy-action@master
+        #uses: aquasecurity/trivy-action@0.30.0
         run: trivy image --format json -o trivy-report.json --ignore-unfixed --vuln-type os,library --severity CRITICAL,HIGH ${{ steps.vars.outputs.tag }}
         #with:
         #  version: latest
@@ -87,4 +87,4 @@ jobs:
           # echo "    smtp.login('${{ secrets.SMTP_USER }}', '${{ secrets.SMTP_PASSWORD }}')" >> send_email.py
           echo "    smtp.send_message(msg)" >> send_email.py
 
-          python3 send_email.py
+          #python3 send_email.py
