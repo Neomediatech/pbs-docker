@@ -88,4 +88,4 @@ jobs:
           # echo "    smtp.login('${{ secrets.SMTP_USER }}', '${{ secrets.SMTP_PASSWORD }}')" >> send_email.py
           echo "    smtp.send_message(msg)" >> send_email.py
 
-          #python3 send_email.py
+          python3 send_email.py
