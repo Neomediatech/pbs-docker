@@ -50,11 +50,16 @@ jobs:
         env:
           INPUT_IMAGE_REF: ${{ steps.vars.outputs.tag }}
 
+      - name: Scan image with Trivy and save JSON report
+        run: trivy image --format json -o trivy-report.json ${{ steps.vars.outputs.tag }}
+
+
       #- name: Scan image with Trivy and save JSON report
       #  run: trivy image --format json -o trivy-report.json ${{ steps.vars.outputs.tag }}
 
       - name: Generate HTML report from JSON
-        run: trivy image --input trivy-report.json --format template --template "@/contrib/html.tpl" -o trivy-report.html
+        run: trivy convert --format template --template "@contrib/html.tpl" -o trivy-report.html trivy-report.json
+        #run: trivy image --input trivy-report.json --format template --template "@/contrib/html.tpl" -o trivy-report.html
 
       - name: Fail if critical/high vulnerabilities found
         run: |
