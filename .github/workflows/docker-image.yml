@@ -4,13 +4,14 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch: # Permette di avviare il workflow manualmente dalla UI di GitHub
 
 jobs:
   build-and-scan:
     runs-on: ubuntu-latest
     outputs:
       # Define an output for this job
-      file_to_copy_output: ${{ steps.set-vars.outputs.file_to_copy }}
+      file_to_copy_output: ${{ steps.vars.outputs.file_to_copy }}
       uploaded-file-id: ${{ steps.upload-step.outputs.artifact-id }}
 
     steps:
@@ -31,7 +32,7 @@ jobs:
           REPO_NAME=$(echo "${REPO_LOWER}"|awk -F'/' '{print $2}')
           echo "tag=ghcr.io/${REPO_LOWER}:latest" >> $GITHUB_OUTPUT
           echo "repo_name=${REPO_NAME}" >> $GITHUB_OUTPUT
-          echo "file_to_copy=${REPO_NAME}-trivy-report.html" >> $GITHUB_OUTPUT
+          echo "file_to_copy=${REPO_NAME}_trivy-report.html" >> $GITHUB_OUTPUT
 
       #- name: Build Docker image
       #  run: docker build -t ${{ steps.vars.outputs.tag }} .
@@ -77,6 +78,7 @@ jobs:
 
       - name: Fail if critical/high vulnerabilities found
         run: |
+          jq trivy-report.json
           jq '.Results[].Vulnerabilities[] | select(.Severity == "CRITICAL" or .Severity == "HIGH")' trivy-report.json && exit 1 || exit 0
 
       #- name: Send email with Trivy report attached
