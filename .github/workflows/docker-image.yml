@@ -8,10 +8,14 @@ on:
 jobs:
   build-and-scan:
     runs-on: ubuntu-latest
+    outputs:
+      # Define an output for this job
+      file_to_copy_output: ${{ steps.set-vars.outputs.file_to_copy }}
+      uploaded-file-id: ${{ steps.upload-step.outputs.artifact-id }}
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
@@ -24,8 +28,10 @@ jobs:
         id: vars
         run: |
           REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          REPO_NAME=$(echo "${REPO_LOWER}"|awk -F'/' '{print $2}')
           echo "tag=ghcr.io/${REPO_LOWER}:latest" >> $GITHUB_OUTPUT
-          #echo "tag=ghcr.io/${REPO_LOWER}:${{ github.sha }}" >> $GITHUB_OUTPUT
+          echo "repo_name=${REPO_NAME}" >> $GITHUB_OUTPUT
+          echo "file_to_copy=${REPO_NAME}-trivy-report.html" >> $GITHUB_OUTPUT
 
       #- name: Build Docker image
       #  run: docker build -t ${{ steps.vars.outputs.tag }} .
@@ -57,35 +63,53 @@ jobs:
         run: wget https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/html.tpl
 
       - name: Generate HTML report from JSON
-        run: trivy convert --format template --template "@$GITHUB_WORKSPACE/html.tpl" -o trivy-report.html trivy-report.json
-        #run: trivy image --input trivy-report.json --format template --template "@/contrib/html.tpl" -o trivy-report.html
+        run: trivy convert --format template --template "@$GITHUB_WORKSPACE/html.tpl" -o ${{ steps.vars.outputs.file_to_copy }} trivy-report.json
+
+      - name: Upload artifact
+        id: upload-step
+        uses: actions/upload-artifact@v4
+        with:
+          name: uploaded-file
+          path: ${{ steps.vars.outputs.file_to_copy }}
+          overwrite: true
+          compression-level: 0
+          retention-days: 1
 
       - name: Fail if critical/high vulnerabilities found
         run: |
           jq '.Results[].Vulnerabilities[] | select(.Severity == "CRITICAL" or .Severity == "HIGH")' trivy-report.json && exit 1 || exit 0
 
-      - name: Send email with Trivy report attached
-        if: always()
-        run: |
-          echo "import smtplib" > send_email.py
-          echo "import ssl" >> send_email.py
-          echo "from email.message import EmailMessage" >> send_email.py
-          echo "from pathlib import Path" >> send_email.py
-          echo "" >> send_email.py
-          echo "msg = EmailMessage()" >> send_email.py
-          echo "msg['Subject'] = '📦 GitHub Actions - Build terminata: ${{ job.status }}'" >> send_email.py
-          echo "msg['From'] = '${{ secrets.SMTP_FROM }}'" >> send_email.py
-          echo "msg['To'] = '${{ secrets.SMTP_TO }}'" >> send_email.py
-          echo "msg.set_content('''Il workflow del repository \"${{ github.repository }}\" è terminato con stato: ${{ job.status }}\n\n🔗 Azione: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\n\nCommit: ${{ github.sha }}\nAutore: ${{ github.actor }}\nJob: ${{ github.workflow }}''')" >> send_email.py
-          echo "" >> send_email.py
-          echo "report_path = Path('trivy-report.html')" >> send_email.py
-          echo "if report_path.exists():" >> send_email.py
-          echo "    with report_path.open('rb') as f:" >> send_email.py
-          echo "        msg.add_attachment(f.read(), maintype='text', subtype='html', filename='trivy-report.html')" >> send_email.py
-          echo "" >> send_email.py
-          echo "context = ssl.create_default_context()" >> send_email.py
-          echo "with smtplib.SMTP_SSL('${{ secrets.SMTP_HOST }}', int('${{ secrets.SMTP_PORT }}'), context=context) as smtp:" >> send_email.py
-          # echo "    smtp.login('${{ secrets.SMTP_USER }}', '${{ secrets.SMTP_PASSWORD }}')" >> send_email.py
-          echo "    smtp.send_message(msg)" >> send_email.py
+      #- name: Send email with Trivy report attached
+      #  if: always()
+      #  run: |
+      #    echo "import smtplib" > send_email.py
+      #    echo "import ssl" >> send_email.py
+      #    echo "from email.message import EmailMessage" >> send_email.py
+      #    echo "from pathlib import Path" >> send_email.py
+      #    echo "" >> send_email.py
+      #    echo "msg = EmailMessage()" >> send_email.py
+      #    echo "msg['Subject'] = '📦 GitHub Actions - Build terminata: ${{ job.status }}'" >> send_email.py
+      #    echo "msg['From'] = '${{ secrets.SMTP_FROM }}'" >> send_email.py
+      #    echo "msg['To'] = '${{ secrets.SMTP_TO }}'" >> send_email.py
+      #    echo "msg.set_content('''Il workflow del repository \"${{ github.repository }}\" è terminato con stato: ${{ job.status }}\n\n🔗 Azione: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\n\nCommit: ${{ github.sha }}\nAutore: ${{ github.actor }}\nJob: ${{ github.workflow }}''')" >> send_email.py
+      #    echo "" >> send_email.py
+      #    echo "report_path = Path('trivy-report.html')" >> send_email.py
+      #    echo "if report_path.exists():" >> send_email.py
+      #    echo "    with report_path.open('rb') as f:" >> send_email.py
+      #    echo "        msg.add_attachment(f.read(), maintype='text', subtype='html', filename='trivy-report.html')" >> send_email.py
+      #    echo "" >> send_email.py
+      #    echo "context = ssl.create_default_context()" >> send_email.py
+      #    echo "with smtplib.SMTP_SSL('${{ secrets.SMTP_HOST }}', int('${{ secrets.SMTP_PORT }}'), context=context) as smtp:" >> send_email.py
+      #    # echo "    smtp.login('${{ secrets.SMTP_USER }}', '${{ secrets.SMTP_PASSWORD }}')" >> send_email.py
+      #    echo "    smtp.send_message(msg)" >> send_email.py
 
-          python3 send_email.py
+      #    python3 send_email.py
+
+
+  push-file-to-repo:
+    needs: [build-and-scan]
+    secrets: inherit
+    uses: Neomediatech/docker-images-scan-reports/.github/workflows/copy-file-to-another-repo.yml@main
+    with:
+      file_id: ${{ needs.build-and-scan.outputs.uploaded-file-id }}
+      filename: ${{ needs.build-and-scan.outputs.file_to_copy_output }}
