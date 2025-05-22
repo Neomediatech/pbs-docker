@@ -78,7 +78,7 @@ jobs:
 
       - name: Fail if critical/high vulnerabilities found
         run: |
-          jq trivy-report.json
+          cat trivy-report.json || ok=1
           jq '.Results[].Vulnerabilities[] | select(.Severity == "CRITICAL" or .Severity == "HIGH")' trivy-report.json && exit 1 || exit 0
 
       #- name: Send email with Trivy report attached
