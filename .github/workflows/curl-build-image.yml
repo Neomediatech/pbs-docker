@@ -28,3 +28,4 @@ jobs:
     secrets: inherit
     with:
       base-image: debian:bookworm
+      package-name: neomediatech/pbs
