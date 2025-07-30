@@ -1,6 +1,7 @@
+ARG STICKY_VERSION=3.4
 FROM debian:bookworm
 
-ENV APP_VERSION=3.4.1-1 \
+ENV APP_VERSION=3.4 \
     DEBIAN_FRONTEND=noninteractive \
     REPO=pbs-docker \
     IMAGE=pbs
@@ -13,22 +14,22 @@ LABEL maintainer="docker-dario@neomediatech.it" \
 
 # workaround to make PBS install
 RUN ln -s /bin/true /usr/bin/systemctl && \
-    echo exit 0 > /usr/sbin/policy-rc.d
-
-# check and execute updates
-RUN apt-get update && \
-    apt-get -y --no-install-recommends --no-install-suggests dist-upgrade
-
-# install some needed package
-RUN apt-get -y --no-install-recommends --no-install-suggests install ca-certificates openssl wget gosu rsyslog tini
+    echo exit 0 > /usr/sbin/policy-rc.d && \
+    # install some needed package
+    apt-get update && \
+    apt-get -y --no-install-recommends --no-install-suggests install ca-certificates openssl wget gosu rsyslog tini && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # add PBS repository
-RUN wget https://enterprise.proxmox.com/debian/proxmox-release-bookworm.gpg -O /etc/apt/trusted.gpg.d/proxmox-release-bookworm.gpg
-RUN echo "deb http://download.proxmox.com/debian/pbs bookworm pbs-no-subscription" > /etc/apt/sources.list.d/pbs-free.list
+RUN wget https://enterprise.proxmox.com/debian/proxmox-release-bookworm.gpg -O /etc/apt/trusted.gpg.d/proxmox-release-bookworm.gpg && \
+    echo "deb http://download.proxmox.com/debian/pbs bookworm pbs-no-subscription" > /etc/apt/sources.list.d/pbs-free.list
 
 # install PBS
 RUN apt-get update && \
-    apt-get install -y -V --no-install-recommends proxmox-backup-server 
+    apt-get install -y -V --no-install-recommends proxmox-backup-server=3.4.3-1 proxmox-backup-docs=3.4.3-1 && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/proxmox-backup* /etc/apt/sources.list.d/pbs-enterprise.list
 
 # disable kernel logging module and log everything to stdout
 RUN sed -i '/.*imklog.*/d' /etc/rsyslog.conf && \

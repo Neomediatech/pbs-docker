@@ -59,6 +59,9 @@ fi
 
 docker_verify_minimum_env
 
+echo "Starting Rsyslogd..."
+rsyslogd
+
 # Start api first in background
 echo -n "Starting Proxmox backup API..."
 /usr/lib/x86_64-linux-gnu/proxmox-backup/proxmox-backup-api &
@@ -80,9 +83,6 @@ docker_setup_env
 if [ -z "$USERS_ALREADY_EXISTS" ]; then
     docker_setup_pbs
 fi
-
-echo "Starting Rsyslogd..."
-rsyslogd
 
 echo "Starting Postfix..."
 /etc/init.d/postfix start || ok=1
