@@ -1,2 +1,3 @@
 mer 30 lug 2025, 16:56:08, UTC --- ghcr.io/neomediatech/pbs:latest UPDATED (image build needed: true)
 mer 30 lug 2025, 16:59:40, UTC --- ghcr.io/neomediatech/pbs:3.4 UPDATED (image build needed: true)
+mer 30 lug 2025, 17:03:20, UTC --- ghcr.io/neomediatech/pbs:3.3 UPDATED (image build needed: true)
