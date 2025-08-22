@@ -6,18 +6,25 @@ ENV APP_VERSION=3.4 \
     REPO=pbs-docker \
     IMAGE=pbs
 
-LABEL maintainer="docker-dario@neomediatech.it" \ 
-      org.label-schema.version=$APP_VERSION \
-      org.label-schema.vcs-type=Git \
-      org.label-schema.vcs-url=https://github.com/Neomediatech/${REPO} \
-      org.label-schema.maintainer=Neomediatech
+LABEL org.opencontainers.image.source=https://github.com/Neomediatech/${REPO} \
+      org.opencontainers.package.name=proxmox-backup-server
+
+ARG BIN_SOURCE=https://github.com/Neomediatech/assets/raw/refs/heads/main/bin
+ADD --chmod=777 ${BIN_SOURCE}/tini \
+                ${BIN_SOURCE}/http \
+                ${BIN_SOURCE}/curl \
+                ${BIN_SOURCE}/wget \
+                /usr/local/bin/
+
+ADD --chmod=777 ${BIN_SOURCE}/gosu \
+                /usr/local/bin/
 
 # workaround to make PBS install
 RUN ln -s /bin/true /usr/bin/systemctl && \
     echo exit 0 > /usr/sbin/policy-rc.d && \
     # install some needed package
     apt-get update && \
-    apt-get -y --no-install-recommends --no-install-suggests install ca-certificates openssl wget gosu rsyslog tini && \
+    apt-get -y --no-install-recommends --no-install-suggests install ca-certificates openssl rsyslog && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
