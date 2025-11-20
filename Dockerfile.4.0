@@ -46,6 +46,7 @@ COPY entrypoint.sh /
 
 # create some dir and change permissions/owner
 RUN mkdir -p /etc/proxmox-backup /var/log/proxmox-backup /var/lib/proxmox-backup /var/log/proxmox-backup/tasks/ /run/proxmox-backup && \
+    sed -i 's/auth.*required.*pam_shells.so/auth   sufficient   pam_shells.so/' /etc/pam.d/chsh && \
     chsh -s /bin/bash backup && \
     usermod -a -G backup root && \
     usermod -g backup root && \
