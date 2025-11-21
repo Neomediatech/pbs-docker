@@ -1,4 +1,4 @@
-FROM debian:bookworm
+FROM debian:trixie
 
 ENV DEBIAN_FRONTEND=noninteractive \
     REPO=pbs-docker \
@@ -27,8 +27,8 @@ RUN ln -s /bin/true /usr/bin/systemctl && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # add PBS repository
-RUN wget https://enterprise.proxmox.com/debian/proxmox-release-bookworm.gpg -O /etc/apt/trusted.gpg.d/proxmox-release-bookworm.gpg && \
-    echo "deb http://download.proxmox.com/debian/pbs bookworm pbs-no-subscription" > /etc/apt/sources.list.d/pbs-free.list
+RUN wget https://enterprise.proxmox.com/debian/proxmox-release-trixie.gpg -O /etc/apt/trusted.gpg.d/proxmox-release-trixie.gpg && \
+    echo "deb http://download.proxmox.com/debian/pbs trixie pbs-no-subscription" > /etc/apt/sources.list.d/pbs-free.list
 
 # install PBS
 RUN apt-get update && \
@@ -44,7 +44,7 @@ COPY entrypoint.sh /
 
 # create some dir and change permissions/owner
 RUN mkdir -p /etc/proxmox-backup /var/log/proxmox-backup /var/lib/proxmox-backup /var/log/proxmox-backup/tasks/ /run/proxmox-backup && \
-    chsh -s /bin/bash backup && \
+    usermod -s /bin/bash backup && \
     usermod -a -G backup root && \
     usermod -g backup root && \
     usermod -aG sudo backup && \
