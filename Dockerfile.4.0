@@ -44,12 +44,9 @@ RUN sed -i '/.*imklog.*/d' /etc/rsyslog.conf && \
 
 COPY entrypoint.sh /
 
-# workaround for chsh
-RUN sed -i 's/auth.*required.*pam_shells.so/auth   sufficient   pam_shells.so/' /etc/pam.d/chsh
-
 # create some dir and change permissions/owner
 RUN mkdir -p /etc/proxmox-backup /var/log/proxmox-backup /var/lib/proxmox-backup /var/log/proxmox-backup/tasks/ /run/proxmox-backup && \
-    chsh -s /bin/bash backup && \
+    usermod -s /bin/bash backup && \
     usermod -a -G backup root && \
     usermod -g backup root && \
     usermod -aG sudo backup && \
