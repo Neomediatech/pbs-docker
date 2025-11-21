@@ -2,3 +2,4 @@ ven 22 ago 2025, 18:15:03, CEST --- ghcr.io/neomediatech/pbs:3.4 done (image bui
 ven 22 ago 2025, 18:15:18, CEST --- ghcr.io/neomediatech/pbs:latest done (image build needed: true)
 ven 22 ago 2025, 18:15:25, CEST --- ghcr.io/neomediatech/pbs:3.3 done (image build needed: true)
 ven 22 ago 2025, 18:15:37, CEST --- ghcr.io/neomediatech/pbs:3.2 done (image build needed: true)
+ven 21 nov 2025, 11:00:53, CET --- ghcr.io/neomediatech/pbs:4.0 done (image build needed: true)
