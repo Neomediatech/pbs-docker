@@ -22,7 +22,7 @@ RUN ln -s /bin/true /usr/bin/systemctl && \
     echo exit 0 > /usr/sbin/policy-rc.d && \
     # install some needed package
     apt-get update && \
-    apt-get -y --no-install-recommends --no-install-suggests install ca-certificates openssl rsyslog && \
+    apt-get -y --no-install-recommends --no-install-suggests install ca-certificates openssl rsyslog iproute2 && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
