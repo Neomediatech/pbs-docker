@@ -1,1 +1,1 @@
-gio 27 nov 2025, 18:05:32, CET --- ghcr.io/neomediatech/pbs:latest done (image build needed: true)
+lun 8 dic 2025, 17:04:00, CET --- ghcr.io/neomediatech/pbs:4.1 done (image build needed: true)

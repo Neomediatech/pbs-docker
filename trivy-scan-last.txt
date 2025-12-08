@@ -1,20 +1,20 @@
-gio 27 nov 2025, 18:06:14, CET --- ghcr.io/neomediatech/pbs:latest
+lun 8 dic 2025, 17:04:40, CET --- ghcr.io/neomediatech/pbs:4.1
 
 Report Summary
 
-┌───────────────────────────────────────────────┬──────────┬─────────────────┬─────────┬───────────────────┐
-│                    Target                     │   Type   │ Vulnerabilities │ Secrets │ Misconfigurations │
-├───────────────────────────────────────────────┼──────────┼─────────────────┼─────────┼───────────────────┤
-│ ghcr.io/neomediatech/pbs:latest (debian 13.2) │  debian  │        0        │    -    │         -         │
-├───────────────────────────────────────────────┼──────────┼─────────────────┼─────────┼───────────────────┤
-│ usr/local/bin/gosu                            │ gobinary │       38        │    -    │         -         │
-├───────────────────────────────────────────────┼──────────┼─────────────────┼─────────┼───────────────────┤
-│ /etc/ssh/ssh_host_ecdsa_key                   │   text   │        -        │    1    │         -         │
-├───────────────────────────────────────────────┼──────────┼─────────────────┼─────────┼───────────────────┤
-│ /etc/ssh/ssh_host_ed25519_key                 │   text   │        -        │    1    │         -         │
-├───────────────────────────────────────────────┼──────────┼─────────────────┼─────────┼───────────────────┤
-│ /etc/ssh/ssh_host_rsa_key                     │   text   │        -        │    1    │         -         │
-└───────────────────────────────────────────────┴──────────┴─────────────────┴─────────┴───────────────────┘
+┌────────────────────────────────────────────┬──────────┬─────────────────┬─────────┬───────────────────┐
+│                   Target                   │   Type   │ Vulnerabilities │ Secrets │ Misconfigurations │
+├────────────────────────────────────────────┼──────────┼─────────────────┼─────────┼───────────────────┤
+│ ghcr.io/neomediatech/pbs:4.1 (debian 13.2) │  debian  │        0        │    -    │         -         │
+├────────────────────────────────────────────┼──────────┼─────────────────┼─────────┼───────────────────┤
+│ usr/local/bin/gosu                         │ gobinary │       39        │    -    │         -         │
+├────────────────────────────────────────────┼──────────┼─────────────────┼─────────┼───────────────────┤
+│ /etc/ssh/ssh_host_ecdsa_key                │   text   │        -        │    1    │         -         │
+├────────────────────────────────────────────┼──────────┼─────────────────┼─────────┼───────────────────┤
+│ /etc/ssh/ssh_host_ed25519_key              │   text   │        -        │    1    │         -         │
+├────────────────────────────────────────────┼──────────┼─────────────────┼─────────┼───────────────────┤
+│ /etc/ssh/ssh_host_rsa_key                  │   text   │        -        │    1    │         -         │
+└────────────────────────────────────────────┴──────────┴─────────────────┴─────────┴───────────────────┘
 Legend:
 - '-': Not scanned
 - '0': Clean (no security findings detected)
@@ -24,14 +24,14 @@ For OSS Maintainers: VEX Notice
 --------------------------------
 If you're an OSS maintainer and Trivy has detected vulnerabilities in your project that you believe are not actually exploitable, consider issuing a VEX (Vulnerability Exploitability eXchange) statement.
 VEX allows you to communicate the actual status of vulnerabilities in your project, improving security transparency and reducing false positives for your users.
-Learn more and start using VEX: https://trivy.dev/v0.67/docs/supply-chain/vex/repo#publishing-vex-documents
+Learn more and start using VEX: https://trivy.dev/docs/v0.68/guide/supply-chain/vex/repo#publishing-vex-documents
 
 To disable this notice, set the TRIVY_DISABLE_VEX_NOTICE environment variable.
 
 
 usr/local/bin/gosu (gobinary)
 =============================
-Total: 38 (HIGH: 35, CRITICAL: 3)
+Total: 39 (HIGH: 36, CRITICAL: 3)
 
 ┌─────────┬────────────────┬──────────┬────────┬───────────────────┬──────────────────────────────────┬──────────────────────────────────────────────────────────────┐
 │ Library │ Vulnerability  │ Severity │ Status │ Installed Version │          Fixed Version           │                            Title                             │
@@ -172,6 +172,10 @@ Total: 38 (HIGH: 35, CRITICAL: 3)
 │         │ CVE-2025-58187 │          │        │                   │ 1.24.9, 1.25.3                   │ Due to the design of the name constraint checking algorithm, │
 │         │                │          │        │                   │                                  │ the proce...                                                 │
 │         │                │          │        │                   │                                  │ https://avd.aquasec.com/nvd/cve-2025-58187                   │
+│         ├────────────────┤          │        │                   ├──────────────────────────────────┼──────────────────────────────────────────────────────────────┤
+│         │ CVE-2025-61729 │          │        │                   │ 1.24.11, 1.25.5                  │ Within HostnameError.Error(), when constructing an error     │
+│         │                │          │        │                   │                                  │ string, there ...                                            │
+│         │                │          │        │                   │                                  │ https://avd.aquasec.com/nvd/cve-2025-61729                   │
 └─────────┴────────────────┴──────────┴────────┴───────────────────┴──────────────────────────────────┴──────────────────────────────────────────────────────────────┘
 
 /etc/ssh/ssh_host_ecdsa_key (secrets)
